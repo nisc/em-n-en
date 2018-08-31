@@ -14,6 +14,7 @@ settings["mod"] := ["Methods", "modifiers", false]
 settings["inl"] := ["Methods", "inline", true]
 settings["hrd"] := ["Methods", "hard_replace", false]
 settings["sww"] := ["General", "startup_run", false]
+settings["dta"] := ["Methods", "inline", false]
 
 if !FileExist(settings_file) {
     write_settings(settings)
@@ -49,7 +50,7 @@ settingsGui() {
 
     ; Standard Settings
     Gui, Settings:font, s8 c505050, Trebuchet MS
-    Gui, Settings:Add, GroupBox, w455 h283, Standard Settings
+    Gui, Settings:Add, GroupBox, w455 h365, Standard Settings
     Gui, Settings:font, s10 c10101f, Trebuchet MS
     Gui, Settings:Add, Text, Left w210 xp+12 yp+22, Method for Dash Insertion:
 
@@ -68,18 +69,25 @@ settingsGui() {
     Gui, Settings:Add, Text, W400 yp+20, Not Recommended. Will replace "-" with En Dash if not directly next to a letter.
     Gui, Settings:font, s10 c10101f, Trebuchet MS
 
+    ; Hack in delta shortcut
+    Gui, Settings:Add, Text, Left w210 yp+35, Method for Delta Insertion:
+    Gui, Add, Checkbox, yp+25 vcheck_delta_inline_method, Delta Inline Replace
+    Gui, Settings:font, s8 c808080, Trebuchet MS
+    Gui, Settings:Add, Text, W400 yp+20, Delta, type: "<D>"
+    Gui, Settings:font, s10 c10101f, Trebuchet MS
+
     Gui, Settings:Add, Text, Left w210 yp+35, Other Settings:
     Gui, Add, Checkbox, yp+25 vcheck_start_with_windows, Start on Windows Startup
     Gui, Settings:font, s10 c810000, Arial
     Gui, Settings:Add, Button, yp+25 w180 gSettingsButtonReset, Reset everything to default
 
     ; Buttons
-    Gui, Settings:Add, Button, Default xp+158 yp+50 w85, Ok
+    Gui, Settings:Add, Button, Default xp+158 yp+55 w85, Ok
     Gui, Settings:Add, Button, xp+100 w85, Apply
     Gui, Settings:Add, Button, xp+100 w85, Cancel
 
     loadSettingsToGui()
-    Gui, show, W500 H400 center, Em-n-en Settings
+    Gui, show, W500 H485 center, Em-n-en Settings
 }
 ; GUI Actions
 settingsButtonOk() {
@@ -97,6 +105,7 @@ loadSettingsToGui(){
     GuiControl, Settings:, check_modifier_method, % settings["mod"][3]
     GuiControl, Settings:, check_inline_method, % settings["inl"][3]
     GuiControl, Settings:, check_hard_replace_method, % settings["hrd"][3]
+    GuiControl, Settings:, check_delta_inline_method, % settings["dta"][3]
     GuiControl, Settings:, check_start_with_windows, % settings["sww"][3]
 }
 pullSettingsFromGui(){
@@ -105,6 +114,7 @@ pullSettingsFromGui(){
     settings["mod"][3] := check_modifier_method
     settings["inl"][3] := check_inline_method
     settings["hrd"][3] := check_hard_replace_method
+    settings["dta"][3] := check_delta_inline_method
     settings["sww"][3] := check_start_with_windows
     save()
     update_sww_state(settings["sww"][3])
@@ -219,4 +229,9 @@ return
 #If, settings["hrd"][3]
 :*:-::
 Send {U+2013}
+return
+
+#If, settings["dta"][3]
+:*?:<D>::
+Send {U+0394}
 return
